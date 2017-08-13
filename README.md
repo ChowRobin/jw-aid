@@ -1,10 +1,10 @@
 # jw-aid
-- This repo is a spider
-- To get infomation from ahu-jwc's website to get more convenient
+- This repo is a spider.
+- To get infomation from ahu-jwc's website to get more convenience.
 
 # Finished
-- Login
+- login home-page.
 
 # Todolist
-- get grades
-- get course timetable
+- get grades.
+- get course timetable.
