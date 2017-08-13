@@ -5,7 +5,7 @@ import http.cookiejar
 from PIL import Image
 from bs4 import BeautifulSoup
 
-class loginSpider:
+class Spider:
 
     def __init__(self):
         # create request headers
@@ -14,16 +14,13 @@ class loginSpider:
             'Referer': 'http://xk1.ahu.cn/default2.aspx',
             'User-Agent': agent
         }
-
-        self.postUrl = 'http://xk1.ahu.cn/default2.aspx'
+        self.Url = 'http://xk1.ahu.cn'
+        self.postUrl = self.Url + '/default2.aspx'
         self.session = requests.session()
         self.session.cookies = http.cookiejar.LWPCookieJar(filename='cookie')
 
-    def loadCookie(self):
-        pass
-
     def getCheckCode(self):
-        imgUrl = 'http://xk1.ahu.cn/CheckCode.aspx'
+        imgUrl = self.Url + '/CheckCode.aspx'
         img = self.session.get(imgUrl)
 
         with open('./checkCode.jpg', 'wb') as f:
@@ -34,8 +31,10 @@ class loginSpider:
         cc.close()
         return code
 
-    def Login(self, username, password):
+    def login(self, userid, password):
         #create post data
+        self.userid = userid
+        self.password = password
         RadioButtonList1 = u"学生".encode('gb2312', 'replace')
         postData = {
             'Button1': '',
@@ -47,22 +46,30 @@ class loginSpider:
             'hidsc': '',
             'lbLanguage': '',
             'txtSecretCode': self.getCheckCode(),
-            'txtUserName': username
+            'txtUserName': userid
         }
         try:
             loginPage = self.session.post(self.postUrl, data=postData, headers=self.headers)
-            res = loginPage.content
-            soup = BeautifulSoup(res, 'html.parser')
-            print(soup)
+#            res = loginPage.content
+#            soup = BeautifulSoup(res, 'html.parser')
+#            print(soup)
             self.session.cookies.save()
+            print('Login Successful\n')
         except:
             print('Login failed\n')
 
+    def getCourseSchedule(self):
+        #get Course-Schedule
+        csUrl = self.Url + '/xskbcx.aspx?xh=' + self.userid + '&xm=%D6%DC%D1%EE%F0%A9&gnmkdm=N121603'
+        res = self.session.get(csUrl, headers=self.headers)
+        print(res.text)
+
 def main():
-    spider = loginSpider()
+    spider = Spider()
     username = input('please input username\n> ')
     password = input('please input password\n> ')
-    spider.Login(username, password)
+    spider.login(username, password)
+    spider.getCourseSchedule()
 
 if __name__ == '__main__':
     main()
