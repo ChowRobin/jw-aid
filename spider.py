@@ -4,6 +4,7 @@ import requests
 import http.cookiejar
 from PIL import Image
 from bs4 import BeautifulSoup
+from courseSchedule_Handler import courseSchedule_Handler
 
 class Spider:
 
@@ -32,7 +33,7 @@ class Spider:
         return code
 
     def login(self, userid, password):
-        #create post data
+        # create post data
         self.userid = userid
         self.password = password
         RadioButtonList1 = u"学生".encode('gb2312', 'replace')
@@ -50,26 +51,49 @@ class Spider:
         }
         try:
             loginPage = self.session.post(self.postUrl, data=postData, headers=self.headers)
-#            res = loginPage.content
-#            soup = BeautifulSoup(res, 'html.parser')
-#            print(soup)
+            #res = loginPage.content
+            #soup = BeautifulSoup(res, 'html.parser')
+            #print(soup)
             self.session.cookies.save()
             print('Login Successful\n')
         except:
             print('Login failed\n')
 
     def getCourseSchedule(self):
-        #get Course-Schedule
+        # get Course-Schedule
         csUrl = self.Url + '/xskbcx.aspx?xh=' + self.userid + '&xm=%D6%DC%D1%EE%F0%A9&gnmkdm=N121603'
         res = self.session.get(csUrl, headers=self.headers)
+        res.encoding = 'gb2312'
+        csHandler = courseSchedule_Handler(res.text)
+        csHandler.writeToFile()        
+
+    def getScore(self):
+        # get Score
+        scoreUrl = self.Url + '/xscjcx_dq.aspx?xh=' + self.userid + '&xm=%u5468%u6768%u7693&gnmkdm=N121605'
+        self.session.headers['Referer'] = scoreUrl
+        f = open('./__VIEWSTATE', 'r')
+        __VIEWSTATE = f.read()
+        f.close()
+        #print(__VIEWSTATE)
+        postData = {
+            '__EVENTARGUMENT': '',
+            '__EVENTTARGET': 'ddlxn',
+            '__EVENTVALIDATION': '/wEWGQKByZPwAQKOwemfDgLGjKL0DQKc6PHxDgKf6O1nApbomfIPApnotegBApjoofIMApvo3egOApLoyfINApXopYsNAprozbADAsCqyt4FAsOqjp8DAsKqkt8CAt2q1h8C3Kq63wMC36r+nwEC3qrCXwLZqobgAQL/wOmfDgK3jaL0DQLwr8PxAgLxr8PxAgLwksmiDnE+Wy6AljpPvSCDMRc3x0GDPNym',
+            '__LASTFOCUS': '',
+            '__VIEWSTATE': __VIEWSTATE,
+            'ddlxn': 'È«²¿',
+            'ddlxq': 'È«²¿'
+        }
+        res = self.session.post(scoreUrl, data=postData)
         print(res.text)
 
 def main():
     spider = Spider()
-    username = input('please input username\n> ')
+    userid= input('please input userid\n> ')
     password = input('please input password\n> ')
-    spider.login(username, password)
-    spider.getCourseSchedule()
+    spider.login(userid, password)
+    #spider.getCourseSchedule()
+    #spider.getScore()
 
 if __name__ == '__main__':
     main()

@@ -1,3 +1,6 @@
 cookie
 checkCode.jpg
 *.swp
+*.pyc
+__pycache__
+__VIEWSTATE
