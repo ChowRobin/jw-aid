@@ -5,8 +5,9 @@
 # Finished
 - login home-page.
 - get course schedule.
+- get grades.
 
 # Todolist
-- get grades.
+- complete details.
 - set up a website to provide service.
 - add function to take lessons.

@@ -5,6 +5,7 @@ import http.cookiejar
 from PIL import Image
 from bs4 import BeautifulSoup
 from courseSchedule_Handler import courseSchedule_Handler
+from score_Handler import score_Handler
 
 class Spider:
 
@@ -23,7 +24,6 @@ class Spider:
     def getCheckCode(self):
         imgUrl = self.Url + '/CheckCode.aspx'
         img = self.session.get(imgUrl)
-
         with open('./checkCode.jpg', 'wb') as f:
             f.write(img.content)
         cc = Image.open('./checkCode.jpg')
@@ -31,7 +31,6 @@ class Spider:
         code = input('please input the checkcode\n> ')
         cc.close()
         return code
-
     def login(self, userid, password):
         # create post data
         self.userid = userid
@@ -64,36 +63,37 @@ class Spider:
         csUrl = self.Url + '/xskbcx.aspx?xh=' + self.userid + '&xm=%D6%DC%D1%EE%F0%A9&gnmkdm=N121603'
         res = self.session.get(csUrl, headers=self.headers)
         res.encoding = 'gb2312'
-        csHandler = courseSchedule_Handler(res.text)
-        csHandler.writeToFile()        
+        handler = courseSchedule_Handler(res.text)
+        handler.writeToFile('course.html')        
 
     def getScore(self):
         # get Score
         scoreUrl = self.Url + '/xscjcx_dq.aspx?xh=' + self.userid + '&xm=%u5468%u6768%u7693&gnmkdm=N121605'
         self.session.headers['Referer'] = scoreUrl
-        f = open('./__VIEWSTATE', 'r')
-        __VIEWSTATE = f.read()
-        f.close()
-        #print(__VIEWSTATE)
+        resp = self.session.get(scoreUrl)
+        #print(resp.content)
         postData = {
             '__EVENTARGUMENT': '',
-            '__EVENTTARGET': 'ddlxn',
-            '__EVENTVALIDATION': '/wEWGQKByZPwAQKOwemfDgLGjKL0DQKc6PHxDgKf6O1nApbomfIPApnotegBApjoofIMApvo3egOApLoyfINApXopYsNAprozbADAsCqyt4FAsOqjp8DAsKqkt8CAt2q1h8C3Kq63wMC36r+nwEC3qrCXwLZqobgAQL/wOmfDgK3jaL0DQLwr8PxAgLxr8PxAgLwksmiDnE+Wy6AljpPvSCDMRc3x0GDPNym',
+            '__EVENTTARGET': '',
+            '__EVENTVALIDATION': u'/wEWFwKFoteZAQLGjKL0DQKc6PHxDgKf6O1nApbomfIPApnotegBApjoofIMApvo3egOApLoyfINApXopYsNAprozbADAsCqyt4FAsOqjp8DAsKqkt8CAt2q1h8C3Kq63wMC36r+nwEC3qrCXwLZqobgAQK3jaL0DQLwr8PxAgLxr8PxAgLwksmiDleNuXGqg8zeCMfvDYzr6RTUCoDV'.encode('gb2312', 'replace'),
             '__LASTFOCUS': '',
-            '__VIEWSTATE': __VIEWSTATE,
-            'ddlxn': 'È«²¿',
-            'ddlxq': 'È«²¿'
+            '__VIEWSTATE': u'/wEPDwULLTIwMTgzOTA4ODYPFgIeBHRqcXIFATAWAgIBD2QWCAIBDxBkEBUSBuWFqOmDqAkyMDAxLTIwMDIJMjAwMi0yMDAzCTIwMDMtMjAwNAkyMDA0LTIwMDUJMjAwNS0yMDA2CTIwMDYtMjAwNwkyMDA3LTIwMDgJMjAwOC0yMDA5CTIwMDktMjAxMAkyMDEwLTIwMTEJMjAxMS0yMDEyCTIwMTItMjAxMwkyMDEzLTIwMTQJMjAxNC0yMDE1CTIwMTUtMjAxNgkyMDE2LTIwMTcJMjAxNy0yMDE4FRIG5YWo6YOoCTIwMDEtMjAwMgkyMDAyLTIwMDMJMjAwMy0yMDA0CTIwMDQtMjAwNQkyMDA1LTIwMDYJMjAwNi0yMDA3CTIwMDctMjAwOAkyMDA4LTIwMDkJMjAwOS0yMDEwCTIwMTAtMjAxMQkyMDExLTIwMTIJMjAxMi0yMDEzCTIwMTMtMjAxNAkyMDE0LTIwMTUJMjAxNS0yMDE2CTIwMTYtMjAxNwkyMDE3LTIwMTgUKwMSZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnFgECEWQCAw8QZGQWAQIBZAIHD2QWBmYPZBYCZg8WAh4JaW5uZXJodG1sBSUyMDE3LTIwMTjlrablubTnrKwx5a2m5pyf5a2m5Lmg5oiQ57upZAIBD2QWBmYPFgIfAQUS5a2m5Y+377yaRTMxNjE0MDI2ZAIBDxYCHwEFEuWnk+WQje+8muWRqOadqOeak2QCAg8WAh8BBSflrabpmaLvvJrorqHnrpfmnLrnp5HlrabkuI7mioDmnK/lrabpmaJkAgIPZBYEZg8WAh8BBRXkuJPkuJrvvJrnvZHnu5zlt6XnqItkAgEPFgIfAQUd6KGM5pS/54+t77yaMTbnuqfnvZHnu5zlt6XnqItkAgkPPCsACwIADxYIHghEYXRhS2V5cxYAHgtfIUl0ZW1Db3VudGYeCVBhZ2VDb3VudAIBHhVfIURhdGFTb3VyY2VJdGVtQ291bnRmZAE8KwAWARE8KwAEAQAWAh4HVmlzaWJsZWhkZAt2s45v3agDPy/+KoC8AZ3m32G3'.encode('gb2312', 'replace'),
+            'btnCx': u' 查  询 '.encode('gb2312', 'replace'),
+            'ddlxn': u'全部'.encode('gb2312', 'replace'),
+            'ddlxq': u'全部'.encode('gb2312', 'replace')
         }
-        res = self.session.post(scoreUrl, data=postData)
-        print(res.text)
+        res = self.session.post(scoreUrl, data=postData, headers=self.headers)
+        res.encoding = 'gb2312'
+        handler = score_Handler(res.text)
+        handler.writeToFile('score.html')
 
 def main():
     spider = Spider()
     userid= input('please input userid\n> ')
     password = input('please input password\n> ')
     spider.login(userid, password)
-    #spider.getCourseSchedule()
-    #spider.getScore()
+    spider.getCourseSchedule()
+    spider.getScore()
 
 if __name__ == '__main__':
     main()

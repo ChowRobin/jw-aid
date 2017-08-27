@@ -3,5 +3,6 @@ checkCode.jpg
 *.swp
 *.pyc
 __pycache__
-__VIEWSTATE
-cs.html
+*.html
+.vscode
+.idea
