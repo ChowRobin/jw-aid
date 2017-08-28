@@ -31,6 +31,7 @@ class Spider:
         code = input('please input the checkcode\n> ')
         cc.close()
         return code
+
     def login(self, userid, password):
         # create post data
         self.userid = userid
@@ -87,13 +88,36 @@ class Spider:
         handler = score_Handler(res.text)
         handler.writeToFile('score.html')
 
+    def getLesson(self, xkurl, id):
+        html = self.session.get(xkurl, headers=headers)
+        soup = BeautifulSoup(html.text, 'html.parser')
+        print(soup.prettify())
+        # viewstate = soup.find('input', name='__VIEWSTATE).get('value')
+        # eventvalidation = soup.find('input', name='__EVENTVALIDATION').get('value')
+        # xkkh = soup.find('table', class_='formlist').findall('tr')[id].find('td')[-1:].find('input').get('value')
+        # print('viewstate:' + viewstate)
+        # print('eventvalidation:' + eventvalidation)
+        # print('xkkh is' + xkkh)
+        postData = {
+            'RadioButtonList1': '1',
+            '__EVENTARGUMENT': '',
+            '__EVENTTARGET': 'Button1',
+            '__EVENTVALIDATION': viewstate.encode('gb2312', 'replace'),
+            '__VIEWSTATE': viewstate.encode('gb2312', 'replace'),
+            'xkkh': xkkh.encode('gb2312', 'replace')
+        }
+        self.session.headers['Referer'] = xkurl
+        res = self.session.post(xkurl, data=postData)
+        #print('res is' + res)    
+
 def main():
     spider = Spider()
     userid= input('please input userid\n> ')
     password = input('please input password\n> ')
     spider.login(userid, password)
-    spider.getCourseSchedule()
-    spider.getScore()
+    #spider.getCourseSchedule()
+    #spider.getScore()
+    #spider.getLesson('', 2)
 
 if __name__ == '__main__':
     main()
