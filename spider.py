@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import requests
+import re
 import http.cookiejar
 from PIL import Image
 from bs4 import BeautifulSoup
@@ -51,9 +52,9 @@ class Spider:
         }
         try:
             loginPage = self.session.post(self.postUrl, data=postData, headers=self.headers)
-            #res = loginPage.content
-            #soup = BeautifulSoup(res, 'html.parser')
-            #print(soup)
+            # res = loginPage.content
+            # soup = BeautifulSoup(res, 'html.parser')
+            # print(soup)
             self.session.cookies.save()
             print('Login Successful\n')
         except:
@@ -89,35 +90,42 @@ class Spider:
         handler.writeToFile('score.html')
 
     def getLesson(self, xkurl, id):
-        html = self.session.get(xkurl, headers=headers)
+        self.session.headers['Referer'] = self.Url + '/xsxk.aspx?xh=' + self.userid + '&xm=%u5468%u6768%u7693&gnmkdm=N121101'
+        html = self.session.get(xkurl)
         soup = BeautifulSoup(html.text, 'html.parser')
-        print(soup.prettify())
-        # viewstate = soup.find('input', name='__VIEWSTATE).get('value')
-        # eventvalidation = soup.find('input', name='__EVENTVALIDATION').get('value')
-        # xkkh = soup.find('table', class_='formlist').findall('tr')[id].find('td')[-1:].find('input').get('value')
-        # print('viewstate:' + viewstate)
-        # print('eventvalidation:' + eventvalidation)
-        # print('xkkh is' + xkkh)
+        # print(soup.prettify())
+        viewstate = soup.find('input', id='__VIEWSTATE').get('value')
+        eventvalidation = soup.find('input', id='__EVENTVALIDATION').get('value')
+        xkkh = soup.find('table', class_='formlist').find_all('tr')[id].find_all('td')[-1].find('input').get('value')
+        # print(viewstate)
+        # print(eventvalidation)
+        # print(xkkh)
         postData = {
             'RadioButtonList1': '1',
             '__EVENTARGUMENT': '',
             '__EVENTTARGET': 'Button1',
-            '__EVENTVALIDATION': viewstate.encode('gb2312', 'replace'),
-            '__VIEWSTATE': viewstate.encode('gb2312', 'replace'),
-            'xkkh': xkkh.encode('gb2312', 'replace')
+            '__EVENTVALIDATION': eventvalidation,
+            '__VIEWSTATE': viewstate,
+            'xkkh': xkkh
         }
         self.session.headers['Referer'] = xkurl
         res = self.session.post(xkurl, data=postData)
-        #print('res is' + res)    
+        # print(res.text)
+        pattern = re.compile(r".*alert.*")
+        ans = re.match(pattern, res.text)
+        print(ans.group())    
 
 def main():
     spider = Spider()
-    userid= input('please input userid\n> ')
+    userid = input('please input userid\n> ')
     password = input('please input password\n> ')
-    spider.login(userid, password)
-    #spider.getCourseSchedule()
-    #spider.getScore()
-    #spider.getLesson('', 2)
+    # spider.login(userid, password)
+    # spider.getCourseSchedule()
+    # spider.getScore()
+    xkurl = ''
+    # 从上往下顺序
+    teacherid = 1
+    spider.getLesson(xkurl, 1)
 
 if __name__ == '__main__':
     main()

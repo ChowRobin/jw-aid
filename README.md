@@ -1,13 +1,14 @@
 # jw-aid
-- This repo is a spider.
-- To get infomation from ahu-jwc's website to get more convenience.
+- 该项目为爬虫项目
+- 通过自动化爬取ahu教务系统信息获取便利
 
 # Finished
-- login home-page.
-- get course schedule.
-- get grades.
+- 模拟登陆首页
+- 获取课程表信息
+- 获取成绩信息
+- 自动选课
 
 # Todolist
-- complete details.
-- set up a website to provide service.
-- add function to take lessons.
+- 完善细节实现用户友好
+- 破解验证码登陆
+- 搭建网站提供平台服务
