@@ -15,7 +15,7 @@ class Spider:
 
     def __init__(self):
         # create request headers
-        self.Url = 'http://xk1.ahu.cn'
+        self.Url = 'http://xk4.ahu.cn'
         agent = 'Mozilla/5.0 (X11; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0'
         self.postUrl = self.Url + '/default2.aspx'
         self.headers = {
@@ -80,7 +80,7 @@ class Spider:
         res.encoding = 'gb2312'
         handler = courseSchedule_Handler(res.text)
         handler.writeToFile('course.html')
-        print('CourseSchedule has saved as Course.html')        
+        print('CourseSchedule has saved as course.html')        
 
     def getScore(self):
         # get Score
@@ -107,13 +107,12 @@ class Spider:
         print("All the score has saved as score.html")
 
     def getLesson(self, xkurl, id):
-        self.session.headers['Referer'] = self.Url + '/xsxk.aspx?xh=' + self.xh + '&xm=%u5468%u6768%u7693' + '&gnmkdm=N121101'
+        self.session.headers['Referer'] = self.Url + '/xsxk.aspx?xh=' + self.xh + '&xm=' + self.xm + '&gnmkdm=N121101'
         html = self.session.get(xkurl)
         soup = BeautifulSoup(html.text, 'html.parser')
         viewstate = soup.find('input', id='__VIEWSTATE').get('value')
         eventvalidation = soup.find('input', id='__EVENTVALIDATION').get('value')
         xkkh = soup.find('table', class_='formlist').find_all('tr')[id].find_all('td')[-1].find('input').get('value')
-        print(xkkh)
         postData = {
             'RadioButtonList1': '1',
             '__EVENTARGUMENT': '',
