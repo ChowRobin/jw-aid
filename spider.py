@@ -127,7 +127,10 @@ class Spider:
             res = self.session.post(xkurl, data=postData)
             pattern = re.compile(r".*alert\('([^']+)'\)")
             ans = re.match(pattern, res.text)
-            print(ans.group(1))    
+            print(ans.group(1))
+            if ans.group(1) == '保存成功！':
+                print("Congratulations!")
+                break
 
 def main():
     spider = Spider()
