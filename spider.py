@@ -2,6 +2,7 @@
 
 import requests
 import re
+import getpass
 from time import sleep
 import http.cookiejar
 from PIL import Image
@@ -84,22 +85,41 @@ class Spider:
 
     def getScore(self):
         # get Score
-        scoreUrl = self.Url + '/xscjcx_dq.aspx?xh=' + self.xh
-        self.session.headers['Referer'] = scoreUrl
-        res = self.session.get(scoreUrl)
-        soup = BeautifulSoup(res.text, 'html.parser')
-        viewstate = soup.find('input', id='__VIEWSTATE').get('value')
-        eventvalidation = soup.find('input', id='__EVENTVALIDATION').get('value')
-        postData = {
-            '__EVENTARGUMENT': '',
-            '__EVENTTARGET': '',
-            '__EVENTVALIDATION': eventvalidation,
-            '__LASTFOCUS': '',
-            '__VIEWSTATE': viewstate,
-            'btnCx': u' 查  询 '.encode('gb2312', 'replace'),
-            'ddlxn': u'全部'.encode('gb2312', 'replace'),
-            'ddlxq': u'全部'.encode('gb2312', 'replace')
-        }
+        try:
+            scoreUrl = self.Url + '/xscjcx.aspx?xh=' + self.xh
+            self.session.headers['Referer'] = scoreUrl
+            res = self.session.get(scoreUrl)
+            soup = BeautifulSoup(res.text, 'html.parser')
+            viewstate = soup.find('input', id='__VIEWSTATE').get('value')
+            eventvalidation = soup.find('input', id='__EVENTVALIDATION').get('value')
+            postData = {
+                '__EVENTARGUMENT': '',
+                '__EVENTTARGET': '',
+                '__EVENTVALIDATION': eventvalidation,
+                '__VIEWSTATE': viewstate,
+                'btn_zcj': u'历年成绩'.encode('gb2312', 'replace'),
+                'ddlXN': '',
+                'ddlXQ': '',
+                'ddl_kcxz': '',
+                'hidLanguage': ''
+            }
+        except:
+            scoreUrl = self.Url + '/xscjcx_dq.aspx?xh=' + self.xh
+            self.session.headers['Referer'] = scoreUrl
+            res = self.session.get(scoreUrl)
+            soup = BeautifulSoup(res.text, 'html.parser')
+            viewstate = soup.find('input', id='__VIEWSTATE').get('value')
+            eventvalidation = soup.find('input', id='__EVENTVALIDATION').get('value')
+            postData = {
+                '__EVENTARGUMENT': '',
+                '__EVENTTARGET': '',
+                '__EVENTVALIDATION': eventvalidation,
+                '__LASTFOCUS': '',
+                '__VIEWSTATE': viewstate,
+                'btnCx': u' 查  询 '.encode('gb2312', 'replace'),
+                'ddlxn': u'全部'.encode('gb2312', 'replace'),
+                'ddlxq': u'全部'.encode('gb2312', 'replace')
+            }
         res = self.session.post(scoreUrl, data=postData, headers=self.headers)
         res.encoding = 'gb2312'
         handler = score_Handler(res.text)
@@ -134,8 +154,8 @@ class Spider:
 
 def main():
     spider = Spider()
-    xh = input('please input xh\n> ')
-    password = input('please input password\n> ')
+    xh = input('please input xh\n>> ')
+    password = getpass.getpass('please input password\n>> ')
     spider.login(xh, password)
     spider.getCourseSchedule()
     spider.getScore()
