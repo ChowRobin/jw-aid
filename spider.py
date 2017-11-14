@@ -159,10 +159,10 @@ def main():
     spider.login(xh, password)
     spider.getCourseSchedule()
     spider.getScore()
-    # xkurl = input('please input xkurl\n> ')
+    xkurl = input('please input xkurl (example: www.google.com)\n> ')
     # 从上往下顺序
-    # teacherid = input('please input teacherid\n> ')
-    # spider.getLesson(xkurl, teacherid)
+    teacherid = input('please input teacherid (example: 1)\n> ')
+    spider.getLesson(str(xkurl), eval(teacherid))
     
 
 if __name__ == '__main__':
