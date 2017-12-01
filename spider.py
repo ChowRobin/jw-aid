@@ -31,11 +31,23 @@ class Spider:
         img = self.session.get(imgUrl)
         with open('./checkCode.jpg', 'wb') as f:
             f.write(img.content)
-        cc = Image.open('./checkCode.jpg')
-        cc.show()
-        code = input('please input the checkcode\n> ')
-        cc.close()
+        try:
+            code = self.killCheckCode()
+        except:
+            cc = Image.open('./checkCode.jpg')
+            cc.show()
+            code = input('please input the checkcode\n> ')
+            cc.close()
         return code
+
+    def killCheckCode(self):
+        f1 = open('./kill_check_url', 'r')
+        kill_url = f1.read()
+        f1.close()
+        files = {'img': ('checkCode.jpg', open('./checkCode.jpg', 'rb'), 'image/png')}
+        res = requests.post(kill_url, files=files)
+        print(re.search(r"{{(....)}}", res.text).group(1))
+        return re.search(r"{{(....)}}", res.text).group(1)       
 
     def login(self, xh, password):
         # create post data
@@ -157,13 +169,17 @@ def main():
     xh = input('please input xh\n>> ')
     password = getpass.getpass('please input password\n>> ')
     spider.login(xh, password)
-    spider.getCourseSchedule()
-    spider.getScore()
+    # spider.getCourseSchedule()
+    # spider.getScore()
     xkurl = input('please input xkurl (example: www.google.com)\n> ')
     # 从上往下顺序
     teacherid = input('please input teacherid (example: 1)\n> ')
-    spider.getLesson(str(xkurl), eval(teacherid))
-    
+    while True:
+        try:
+            spider.getLesson(xkurl, teacherid)
+        except:
+            spider.login(xh, password)
+            
 
 if __name__ == '__main__':
     main()
