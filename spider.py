@@ -176,7 +176,7 @@ def main():
     teacherid = input('please input teacherid (example: 1)\n> ')
     while True:
         try:
-            spider.getLesson(xkurl, teacherid)
+            spider.getLesson(str(xkurl), eval(teacherid))
         except:
             spider.login(xh, password)
             
